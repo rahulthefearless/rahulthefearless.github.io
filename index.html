@@ -309,6 +309,498 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
       <div class="card">
         <div class="clbl">Score trend</div>
         <div class="chart-wrap" id="d-chart"></div>
+        <div style="display:flex;font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px;" id="d-<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sleep Lab AI v6 — Boat Wave 2</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06060e;--s1:#0c0c18;--s2:#111120;--s3:#16162a;
+  --border:#1e1e35;--border2:#262640;--text:#ddddf5;
+  --muted:#5a5a80;--accent:#6c63ff;
+  --green:#00e5a0;--green-dim:rgba(0,229,160,0.1);
+  --red:#ff4d6d;--red-dim:rgba(255,77,109,0.1);
+  --amber:#ffaa00;--amber-dim:rgba(255,170,0,0.1);
+  --blue:#4da6ff;--purple:#c084fc;
+  --mono:'Space Mono',monospace;--sans:'Inter',sans-serif;--display:'Bebas Neue',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px);}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;opacity:0.3;}
+.orb1{width:500px;height:500px;background:#6c63ff;top:-150px;right:-150px;}
+.orb2{width:400px;height:400px;background:#00e5a0;bottom:-100px;left:-100px;}
+.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:2rem 1.25rem 5rem;}
+
+/* ── SETUP ── */
+#setup{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+.setup-box{max-width:520px;width:100%;background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:2rem;}
+.setup-logo{font-family:var(--display);font-size:42px;letter-spacing:2px;text-align:center;color:#fff;margin-bottom:2px;}
+.setup-logo span{color:var(--green);}
+.setup-badge{text-align:center;margin-bottom:1.5rem;}
+.free-badge{display:inline-block;background:var(--green-dim);border:1px solid rgba(0,229,160,0.3);color:var(--green);font-family:var(--mono);font-size:10px;letter-spacing:2px;padding:4px 14px;border-radius:99px;}
+.setup-sub{font-family:var(--mono);font-size:10px;color:var(--muted);text-align:center;margin-bottom:1.5rem;line-height:1.8;}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem;}
+.step{display:flex;gap:12px;align-items:flex-start;font-size:12px;color:var(--muted);line-height:1.6;}
+.snum{width:24px;height:24px;border-radius:50%;background:var(--green);color:#000;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.step a{color:var(--green);text-decoration:none;}
+.step a:hover{text-decoration:underline;}
+.step code{color:var(--amber);font-size:11px;background:var(--s2);padding:1px 5px;border-radius:3px;}
+.key-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;display:block;margin-bottom:6px;}
+.key-inp{width:100%;background:var(--s2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:11px 14px;font-size:13px;font-family:var(--mono);outline:none;margin-bottom:10px;transition:border-color 0.15s;}
+.key-inp:focus{border-color:var(--green);}
+.btn-setup{width:100%;background:linear-gradient(135deg,#00b37a,var(--green));color:#000;border:none;padding:12px;border-radius:8px;font-family:var(--mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-weight:700;}
+.btn-setup:hover{opacity:0.9;}
+.key-err{display:none;color:var(--red);font-size:11px;font-family:var(--mono);text-align:center;margin-top:8px;}
+.sec-note{background:var(--s2);border-radius:8px;padding:10px 12px;margin-top:12px;font-size:11px;color:var(--muted);line-height:1.6;text-align:center;}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;gap:1rem;}
+.eyebrow{font-family:var(--mono);font-size:9px;letter-spacing:4px;color:var(--green);margin-bottom:6px;}
+.logo{font-family:var(--display);font-size:46px;letter-spacing:2px;line-height:1;color:#fff;}
+.logo span{color:var(--green);}
+.tagline{font-size:11px;color:var(--muted);margin-top:6px;font-family:var(--mono);line-height:1.6;}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0;}
+.nights-badge{background:var(--s2);border:1px solid var(--border2);border-radius:12px;padding:10px 16px;text-align:center;}
+.nb-num{font-family:var(--display);font-size:32px;color:var(--green);line-height:1;}
+.nb-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:2px;margin-top:2px;}
+.btn-key{font-family:var(--mono);font-size:9px;color:var(--muted);background:transparent;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;cursor:pointer;letter-spacing:1px;}
+.btn-key:hover{color:var(--text);border-color:var(--border);}
+
+/* ── TABS ── */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:2rem;overflow-x:auto;gap:0;}
+.tab{font-family:var(--mono);font-size:10px;letter-spacing:2px;text-transform:uppercase;padding:11px 14px;background:transparent;border:none;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;white-space:nowrap;}
+.tab.on{color:var(--green);border-bottom-color:var(--green);}
+.tab:hover:not(.on){color:var(--text);}
+.pane{display:none;}.pane.on{display:block;}
+
+/* ── CARD ── */
+.card{background:var(--s1);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;margin-bottom:1rem;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);}
+.clbl{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px;}
+.clbl::before{content:'// ';color:var(--green);}
+
+/* ── UPLOAD ── */
+.upload-zone{border:1.5px dashed var(--border2);border-radius:12px;padding:2.5rem 1rem;text-align:center;cursor:pointer;background:var(--s2);transition:all 0.15s;position:relative;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--green);background:var(--green-dim);}
+.uz-icon{font-size:32px;margin-bottom:10px;}
+.uz-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+.uz-sub{font-size:11px;color:var(--muted);font-family:var(--mono);}
+.uz-prev{max-width:160px;border-radius:8px;margin:12px auto 0;display:none;border:0.5px solid var(--border2);}
+
+/* ── AI STATUS ── */
+.ai-st{display:none;align-items:center;gap:10px;background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:10px 14px;margin-top:10px;}
+.ai-st.show{display:flex;}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;}
+.ai-dot.pulse{animation:pulse 0.9s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.2;transform:scale(0.6)}}
+.ai-txt{font-size:12px;color:var(--muted);font-family:var(--mono);flex:1;}
+
+/* ── EXTRACTED ── */
+.ex-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;}
+.ex-box{background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:11px;text-align:center;}
+.ex-val{font-family:var(--display);font-size:26px;letter-spacing:1px;line-height:1;}
+.ex-lbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:3px;}
+
+/* ── FORM ── */
+.frow2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.field label{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;}
+.field input,.field textarea{background:var(--s2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:9px 12px;font-size:13px;font-family:var(--sans);outline:none;transition:border-color 0.15s;width:100%;}
+.field input:focus,.field textarea:focus{border-color:var(--green);}
+.field textarea{resize:vertical;min-height:58px;line-height:1.6;font-size:12px;}
+
+/* ── HABITS ── */
+.hlbl{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin:14px 0 8px;}
+.hgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.hc{display:flex;align-items:center;gap:8px;padding:7px 10px;border:0.5px solid var(--border);border-radius:8px;cursor:pointer;background:var(--s2);transition:all 0.12s;user-select:none;}
+.hc:hover{border-color:var(--border2);}
+.hc.yes{border-color:var(--green);background:var(--green-dim);}
+.hc.no{border-color:var(--red);background:var(--red-dim);}
+.hc-box{width:14px;height:14px;border-radius:3px;border:0.5px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;}
+.hc.yes .hc-box{background:var(--green);border-color:var(--green);color:#000;}
+.hc.no .hc-box{background:var(--red);border-color:var(--red);color:#fff;}
+.hc-lbl{font-size:11px;color:var(--muted);line-height:1.3;}
+.hc.yes .hc-lbl,.hc.no .hc-lbl{color:var(--text);}
+
+/* ── BUTTONS ── */
+.btn-save{width:100%;margin-top:10px;padding:12px;font-size:13px;font-weight:600;background:linear-gradient(135deg,#00b37a,var(--green));color:#000;border:none;border-radius:10px;cursor:pointer;font-family:var(--sans);transition:all 0.15s;}
+.btn-save:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,229,160,0.2);}
+.confirm-msg{display:none;text-align:center;padding:10px;font-size:12px;color:var(--green);background:var(--green-dim);border:0.5px solid rgba(0,229,160,0.3);border-radius:8px;margin-top:8px;font-family:var(--mono);}
+
+/* ── DASHBOARD ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.stat-box{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.stat-val{font-family:var(--display);font-size:24px;letter-spacing:1px;line-height:1;}
+.stat-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+.chart-wrap{height:90px;display:flex;align-items:flex-end;gap:5px;margin-bottom:4px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;}
+.chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;position:relative;cursor:pointer;}
+.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:10px;white-space:nowrap;font-family:var(--mono);color:var(--text);z-index:10;}
+.chart-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:3px;}
+
+/* ── LOG ITEMS ── */
+.log-item{background:var(--s2);border:0.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:7px;}
+.log-item:hover{border-color:var(--border2);}
+.li-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.li-date{font-family:var(--display);font-size:17px;letter-spacing:1px;}
+.li-score{font-family:var(--display);font-size:20px;letter-spacing:1px;padding:2px 12px;border-radius:99px;}
+.li-stages{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);}
+.li-stages span{color:var(--text);}
+.li-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.tag{font-size:10px;padding:2px 7px;border-radius:99px;font-family:var(--mono);}
+.tag-g{background:var(--green-dim);color:var(--green);}
+.tag-b{background:var(--red-dim);color:var(--red);}
+.li-note{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;line-height:1.5;}
+
+/* ── INSIGHTS ── */
+.insight{border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.7;display:flex;gap:8px;}
+.ins-g{background:var(--green-dim);border:0.5px solid rgba(0,229,160,0.25);}
+.ins-r{background:var(--red-dim);border:0.5px solid rgba(255,77,109,0.25);}
+.ins-a{background:var(--amber-dim);border:0.5px solid rgba(255,170,0,0.25);}
+.ins-p{background:rgba(192,132,252,0.08);border:0.5px solid rgba(192,132,252,0.2);}
+.ins-i{font-size:15px;flex-shrink:0;}
+.ins-t{color:var(--muted);}
+.ins-t strong{color:var(--text);}
+
+/* ── HABIT SCIENCE ── */
+.ir-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:12px;}
+.ir-row:last-child{border-bottom:none;}
+.ir-name{flex:1;}
+.ir-track{width:80px;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.ir-fill{height:100%;border-radius:2px;}
+.ir-val{font-family:var(--mono);font-size:11px;font-weight:700;min-width:55px;text-align:right;}
+.ir-n{font-family:var(--mono);font-size:9px;color:var(--muted);}
+
+/* ── PROTOCOL ── */
+.proto-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.proto-col{background:var(--s2);border-radius:10px;padding:12px;border:0.5px solid var(--border);}
+.proto-col h4{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}
+.proto-col.do h4{color:var(--green);}
+.proto-col.avoid h4{color:var(--red);}
+.pi{display:flex;gap:7px;margin-bottom:9px;font-size:11px;color:var(--muted);line-height:1.55;align-items:flex-start;}
+.pi:last-child{margin-bottom:0;}
+.pi-s{font-family:var(--mono);font-size:9px;display:block;margin-top:2px;}
+.pi-c{color:var(--green);}
+.pi-p{color:var(--amber);}
+.pi-h{color:var(--red);}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:12px;font-family:var(--mono);}
+.empty-i{font-size:30px;margin-bottom:10px;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+@media(max-width:560px){
+  .proto-grid,.stat-row,.ex-grid{grid-template-columns:1fr 1fr;}
+  .hgrid,.frow2{grid-template-columns:1fr;}
+  .hdr{flex-direction:column;}
+  .logo{font-size:36px;}
+  .tabs{font-size:9px;}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- ══════════ SETUP ══════════ -->
+<div id="setup">
+  <div class="setup-box">
+    <div class="setup-logo">Sleep <span>Lab</span> AI</div>
+    <div class="setup-badge"><span class="free-badge">✦ POWERED BY GEMINI — 100% FREE FOREVER</span></div>
+    <div class="setup-sub">Google Gemini Vision reads your screenshots automatically.<br>Free tier: 1,500 scans/day — more than enough for daily tracking.</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="snum">1</div>
+        <div>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> — sign in with your Google account</div>
+      </div>
+      <div class="step">
+        <div class="snum">2</div>
+        <div>Click <strong style="color:var(--text)">Create API Key</strong> — it generates instantly, completely free</div>
+      </div>
+      <div class="step">
+        <div class="snum">3</div>
+        <div>Copy the key — it looks like <code>AIzaSy...</code></div>
+      </div>
+      <div class="step">
+        <div class="snum">4</div>
+        <div>Paste it below and open your Sleep Lab — you're done forever</div>
+      </div>
+    </div>
+
+    <label class="key-lbl">YOUR GOOGLE GEMINI API KEY</label>
+    <input type="password" class="key-inp" id="key-inp" placeholder="AIzaSy...">
+    <button class="btn-setup" onclick="saveKey()">Save key &amp; open Sleep Lab →</button>
+    <div class="key-err" id="key-err">⚠ Key must start with AIza</div>
+    <div class="sec-note">🔒 Stored only in <strong style="color:var(--text)">your browser</strong> — never sent anywhere except Google's API directly.</div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="wrap" id="app" style="display:none">
+
+  <div class="hdr">
+    <div>
+      <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
+      <div class="logo">Sleep <span>Lab</span> AI</div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v6 SMART-PROMPT</span></div>
+    </div>
+    <div class="hdr-right">
+      <div class="nights-badge">
+        <div class="nb-num" id="nights-count">0</div>
+        <div class="nb-lbl">Nights<br>Tracked</div>
+      </div>
+      <button class="btn-key" onclick="changeKey()">⚙ Gemini Key</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="sTab('scan',this)">📸 Scan</button>
+    <button class="tab" onclick="sTab('dash',this)">📊 Dashboard</button>
+    <button class="tab" onclick="sTab('science',this)">🧪 Habit Science</button>
+    <button class="tab" onclick="sTab('protocol',this)">📋 Protocol</button>
+  </div>
+
+  <!-- SCAN -->
+  <div id="pane-scan" class="pane on">
+    <div class="card">
+      <div class="clbl">Upload tonight's screenshot</div>
+      <div class="upload-zone" id="uz" onclick="document.getElementById('fi').click()">
+        <input type="file" accept="image/*" id="fi" style="display:none" onchange="handleFile(this)">
+        <div class="uz-icon">📱</div>
+        <div class="uz-title">Tap to upload your Boat Wave 2 screenshot</div>
+        <div class="uz-sub">Gemini Vision reads all sleep values automatically — free</div>
+        <img id="uz-prev" class="uz-prev">
+      </div>
+      <div class="ai-st" id="ai-st">
+        <div class="ai-dot pulse" id="ai-dot"></div>
+        <div class="ai-txt" id="ai-txt">Reading screenshot with Gemini...</div>
+      </div>
+    </div>
+
+    <div class="card" id="ex-card" style="display:none">
+      <div class="clbl">Extracted data — review &amp; confirm</div>
+      <div class="ex-grid">
+        <div class="ex-box"><div class="ex-val" id="ex-score" style="color:var(--amber)">—</div><div class="ex-lbl">Sleep score</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-deep" style="color:var(--red)">—</div><div class="ex-lbl">Deep (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-rem" style="color:var(--purple)">—</div><div class="ex-lbl">REM (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-light" style="color:var(--green)">—</div><div class="ex-lbl">Light (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-awake" style="color:var(--amber)">—</div><div class="ex-lbl">Awake (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-total" style="color:var(--blue)">—</div><div class="ex-lbl">Total (min)</div></div>
+      </div>
+      <div class="frow2">
+        <div class="field"><label>Slept at (actual)</label><input type="time" id="ex-slept"></div>
+        <div class="field"><label>Woke at</label><input type="time" id="ex-woke"></div>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="ex-date"></div>
+
+      <div class="hlbl">✓ What I did GOOD tonight</div>
+      <div class="hgrid" id="good-grid"></div>
+      <div class="hlbl">✗ What I skipped / did BAD</div>
+      <div class="hgrid" id="bad-grid"></div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Notes / confounders (stress, noise, travel, illness...)</label>
+        <textarea id="ex-notes" placeholder="Flag anything unusual — flagged nights are excluded from habit scoring"></textarea>
+      </div>
+      <button class="btn-save" onclick="confirmSave()">✓ Confirm and save to lab</button>
+      <div class="confirm-msg" id="confirm-msg">✓ NIGHT LOGGED — dashboard updated</div>
+    </div>
+  </div>
+
+  /* ── DASHBOARD ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+.stat-box{background:var(--s2);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center;}
+.stat-val{font-family:var(--display);font-size:24px;letter-spacing:1px;line-height:1;}
+.stat-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:3px;}
+.chart-wrap{height:90px;display:flex;align-items:flex-end;gap:5px;margin-bottom:4px;}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;}
+.chart-bar{width:100%;border-radius:3px 3px 0 0;min-height:3px;position:relative;cursor:pointer;}
+.chart-bar:hover::after{content:attr(data-tip);position:absolute;bottom:105%;left:50%;transform:translateX(-50%);background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:10px;white-space:nowrap;font-family:var(--mono);color:var(--text);z-index:10;}
+.chart-lbl{font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:3px;}
+
+/* ── LOG ITEMS ── */
+.log-item{background:var(--s2);border:0.5px solid var(--border);border-radius:10px;padding:12px;margin-bottom:7px;}
+.log-item:hover{border-color:var(--border2);}
+.li-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.li-date{font-family:var(--display);font-size:17px;letter-spacing:1px;}
+.li-score{font-family:var(--display);font-size:20px;letter-spacing:1px;padding:2px 12px;border-radius:99px;}
+.li-stages{font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);}
+.li-stages span{color:var(--text);}
+.li-tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px;}
+.tag{font-size:10px;padding:2px 7px;border-radius:99px;font-family:var(--mono);}
+.tag-g{background:var(--green-dim);color:var(--green);}
+.tag-b{background:var(--red-dim);color:var(--red);}
+.li-note{font-size:11px;color:var(--muted);margin-top:6px;font-style:italic;line-height:1.5;}
+
+/* ── INSIGHTS ── */
+.insight{border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:12px;line-height:1.7;display:flex;gap:8px;}
+.ins-g{background:var(--green-dim);border:0.5px solid rgba(0,229,160,0.25);}
+.ins-r{background:var(--red-dim);border:0.5px solid rgba(255,77,109,0.25);}
+.ins-a{background:var(--amber-dim);border:0.5px solid rgba(255,170,0,0.25);}
+.ins-p{background:rgba(192,132,252,0.08);border:0.5px solid rgba(192,132,252,0.2);}
+.ins-i{font-size:15px;flex-shrink:0;}
+.ins-t{color:var(--muted);}
+.ins-t strong{color:var(--text);}
+
+/* ── HABIT SCIENCE ── */
+.ir-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:0.5px solid var(--border);font-size:12px;}
+.ir-row:last-child{border-bottom:none;}
+.ir-name{flex:1;}
+.ir-track{width:80px;height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.ir-fill{height:100%;border-radius:2px;}
+.ir-val{font-family:var(--mono);font-size:11px;font-weight:700;min-width:55px;text-align:right;}
+.ir-n{font-family:var(--mono);font-size:9px;color:var(--muted);}
+
+/* ── PROTOCOL ── */
+.proto-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.proto-col{background:var(--s2);border-radius:10px;padding:12px;border:0.5px solid var(--border);}
+.proto-col h4{font-family:var(--mono);font-size:9px;letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;}
+.proto-col.do h4{color:var(--green);}
+.proto-col.avoid h4{color:var(--red);}
+.pi{display:flex;gap:7px;margin-bottom:9px;font-size:11px;color:var(--muted);line-height:1.55;align-items:flex-start;}
+.pi:last-child{margin-bottom:0;}
+.pi-s{font-family:var(--mono);font-size:9px;display:block;margin-top:2px;}
+.pi-c{color:var(--green);}
+.pi-p{color:var(--amber);}
+.pi-h{color:var(--red);}
+
+/* ── MISC ── */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:12px;font-family:var(--mono);}
+.empty-i{font-size:30px;margin-bottom:10px;}
+::-webkit-scrollbar{width:3px;height:3px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+@media(max-width:560px){
+  .proto-grid,.stat-row,.ex-grid{grid-template-columns:1fr 1fr;}
+  .hgrid,.frow2{grid-template-columns:1fr;}
+  .hdr{flex-direction:column;}
+  .logo{font-size:36px;}
+  .tabs{font-size:9px;}
+}
+</style>
+</head>
+<body>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- ══════════ SETUP ══════════ -->
+<div id="setup">
+  <div class="setup-box">
+    <div class="setup-logo">Sleep <span>Lab</span> AI</div>
+    <div class="setup-badge"><span class="free-badge">✦ POWERED BY GEMINI — 100% FREE FOREVER</span></div>
+    <div class="setup-sub">Google Gemini Vision reads your screenshots automatically.<br>Free tier: 1,500 scans/day — more than enough for daily tracking.</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="snum">1</div>
+        <div>Go to <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a> — sign in with your Google account</div>
+      </div>
+      <div class="step">
+        <div class="snum">2</div>
+        <div>Click <strong style="color:var(--text)">Create API Key</strong> — it generates instantly, completely free</div>
+      </div>
+      <div class="step">
+        <div class="snum">3</div>
+        <div>Copy the key — it looks like <code>AIzaSy...</code></div>
+      </div>
+      <div class="step">
+        <div class="snum">4</div>
+        <div>Paste it below and open your Sleep Lab — you're done forever</div>
+      </div>
+    </div>
+
+    <label class="key-lbl">YOUR GOOGLE GEMINI API KEY</label>
+    <input type="password" class="key-inp" id="key-inp" placeholder="AIzaSy...">
+    <button class="btn-setup" onclick="saveKey()">Save key &amp; open Sleep Lab →</button>
+    <div class="key-err" id="key-err">⚠ Key must start with AIza</div>
+    <div class="sec-note">🔒 Stored only in <strong style="color:var(--text)">your browser</strong> — never sent anywhere except Google's API directly.</div>
+  </div>
+</div>
+
+<!-- ══════════ MAIN APP ══════════ -->
+<div class="wrap" id="app" style="display:none">
+
+  <div class="hdr">
+    <div>
+      <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
+      <div class="logo">Sleep <span>Lab</span> AI</div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v6 SMART-PROMPT</span></div>
+    </div>
+    <div class="hdr-right">
+      <div class="nights-badge">
+        <div class="nb-num" id="nights-count">0</div>
+        <div class="nb-lbl">Nights<br>Tracked</div>
+      </div>
+      <button class="btn-key" onclick="changeKey()">⚙ Gemini Key</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab on" onclick="sTab('scan',this)">📸 Scan</button>
+    <button class="tab" onclick="sTab('dash',this)">📊 Dashboard</button>
+    <button class="tab" onclick="sTab('science',this)">🧪 Habit Science</button>
+    <button class="tab" onclick="sTab('protocol',this)">📋 Protocol</button>
+  </div>
+
+  <!-- SCAN -->
+  <div id="pane-scan" class="pane on">
+    <div class="card">
+      <div class="clbl">Upload tonight's screenshot</div>
+      <div class="upload-zone" id="uz" onclick="document.getElementById('fi').click()">
+        <input type="file" accept="image/*" id="fi" style="display:none" onchange="handleFile(this)">
+        <div class="uz-icon">📱</div>
+        <div class="uz-title">Tap to upload your Boat Wave 2 screenshot</div>
+        <div class="uz-sub">Gemini Vision reads all sleep values automatically — free</div>
+        <img id="uz-prev" class="uz-prev">
+      </div>
+      <div class="ai-st" id="ai-st">
+        <div class="ai-dot pulse" id="ai-dot"></div>
+        <div class="ai-txt" id="ai-txt">Reading screenshot with Gemini...</div>
+      </div>
+    </div>
+
+    <div class="card" id="ex-card" style="display:none">
+      <div class="clbl">Extracted data — review &amp; confirm</div>
+      <div class="ex-grid">
+        <div class="ex-box"><div class="ex-val" id="ex-score" style="color:var(--amber)">—</div><div class="ex-lbl">Sleep score</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-deep" style="color:var(--red)">—</div><div class="ex-lbl">Deep (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-rem" style="color:var(--purple)">—</div><div class="ex-lbl">REM (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-light" style="color:var(--green)">—</div><div class="ex-lbl">Light (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-awake" style="color:var(--amber)">—</div><div class="ex-lbl">Awake (min)</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-total" style="color:var(--blue)">—</div><div class="ex-lbl">Total (min)</div></div>
+      </div>
+      <div class="frow2">
+        <div class="field"><label>Slept at (actual)</label><input type="time" id="ex-slept"></div>
+        <div class="field"><label>Woke at</label><input type="time" id="ex-woke"></div>
+      </div>
+      <div class="field"><label>Date</label><input type="date" id="ex-date"></div>
+
+      <div class="hlbl">✓ What I did GOOD tonight</div>
+      <div class="hgrid" id="good-grid"></div>
+      <div class="hlbl">✗ What I skipped / did BAD</div>
+      <div class="hgrid" id="bad-grid"></div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Notes / confounders (stress, noise, travel, illness...)</label>
+        <textarea id="ex-notes" placeholder="Flag anything unusual — flagged nights are excluded from habit scoring"></textarea>
+      </div>
+      <button class="btn-save" onclick="confirmSave()">✓ Confirm and save to lab</button>
+      <div class="confirm-msg" id="confirm-msg">✓ NIGHT LOGGED — dashboard updated</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="pane-dash" class="pane">
+    <div id="dash-empty" class="card"><div class="empty"><div class="empty-i">📊</div>No nights logged yet.<br>Upload your first screenshot in the Scan tab.</div></div>
+    <div id="dash-main" style="display:none">
+      <div class="card" id="d-overview"></div>
+      <div class="card">
+        <div class="clbl">Score trend</div>
+        <div class="chart-wrap" id="d-chart"></div>
         <div style="display:flex;font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px;" id="d-labels"></div>
       </div>
       <div class="card"><div class="clbl">Auto insights</div><div id="d-insights"></div></div>
@@ -476,8 +968,7 @@ async function callGemini(b64,mime){
     dot.classList.remove('pulse');
     return;
   }
-
-  const prompt=`You are analyzing a sleep tracking app screenshot from a Boat Wave 2 smartwatch or Zepp app.
+const prompt=`You are analyzing a sleep tracking app screenshot from a Boat Wave 2 smartwatch or Zepp app.
 
 Look VERY carefully at the ENTIRE image. Find ALL numbers and times visible anywhere on screen.
 
@@ -671,7 +1162,6 @@ function confirmSave(){
   document.getElementById('ex-notes').value='';
   curEx={};
 }
-
 // ── DASHBOARD ──
 function renderDash(){
   const data=ld();
