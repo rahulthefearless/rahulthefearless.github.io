@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sleep Lab AI v4 — Boat Wave 2</title>
+<title>Sleep Lab AI v5 — Boat Wave 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div>
       <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
       <div class="logo">Sleep <span>Lab</span> AI</div>
-      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v4 AUTO-DISCOVER</span></div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v5 JSON-FIX</span></div>
     </div>
     <div class="hdr-right">
       <div class="nights-badge">
@@ -551,8 +551,40 @@ Return ONLY the JSON. No other text.`;
     if(!data)throw new Error('All models failed. Last error: '+lastErr);
 
     const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
-    const clean=raw.replace(/```json|```/g,'').trim();
-    const parsed=JSON.parse(clean);
+    console.log('Gemini raw response:', raw);
+
+    // Bulletproof JSON extraction — handles markdown, extra text, anything
+    let parsed = {};
+    try {
+      // Try 1: direct parse
+      const clean = raw.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e1) {
+      try {
+        // Try 2: extract first {...} block
+        const match = raw.match(/\{[^{}]*\}/);
+        if(match) parsed = JSON.parse(match[0]);
+        else throw new Error('no JSON object found');
+      } catch(e2) {
+        try {
+          // Try 3: extract numbers individually with regex
+          const num = (pattern) => { const m = raw.match(pattern); return m ? parseInt(m[1]) : null; };
+          const time = (pattern) => { const m = raw.match(pattern); return m ? m[1] : null; };
+          parsed = {
+            score:        num(/score[^\d]*(\d+)/i),
+            sleptAt:      time(/slept?\s*at[^\d]*(\d{1,2}:\d{2})/i),
+            wokeAt:       time(/woke?\s*at[^\d]*(\d{1,2}:\d{2})/i),
+            totalMinutes: num(/total[^\d]*(\d+)\s*min/i),
+            deepMinutes:  num(/deep[^\d]*(\d+)\s*min/i),
+            remMinutes:   num(/rem[^\d]*(\d+)\s*min/i),
+            lightMinutes: num(/light[^\d]*(\d+)\s*min/i),
+            awakeMinutes: num(/awake[^\d]*(\d+)\s*min/i),
+          };
+        } catch(e3) {
+          console.error('All JSON parse attempts failed:', e1, e2, e3);
+        }
+      }
+    }
 
     curEx=parsed;
     populate(parsed);
