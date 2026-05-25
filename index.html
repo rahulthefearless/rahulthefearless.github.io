@@ -301,6 +301,375 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     </div>
   </div>
 
+  <!-- DASHBOARD -->
+  <!-- DASHBOARD -->
+  <div id="pane-dash" class="pane">
+    <div id="dash-empty" class="card"><div class="empty"><div class="empty-i">📊</div>No nights logged yet.<br>Upload your first screenshot in the Scan tab.</div></div>
+    <div id="dash-main" style="display:none">
+      <div class="card" id="d-overview"></div>
+      <div class="card">
+        <div class="clbl">Score trend</div>
+        <div class="chart-wrap" id="d-chart"></div>
+        <div style="display:flex;font-family:var(--mono);font-size:8px;color:var(--muted);margin-top:4px;" id="d-labels"></div>
+      </div>
+      <div class="card"><div class="clbl">Auto insights</div><div id="d-insights"></div></div>
+      <div class="card"><div class="clbl">All nights</div><div id="d-logs"></div></div>
+    </div>
+  </div>
+
+  <!-- HABIT SCIENCE -->
+  <div id="pane-science" class="pane">
+    <div class="card">
+      <div class="clbl">Habit impact on sleep score</div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--muted);margin-bottom:14px;line-height:1.7;">Avg score delta: nights WITH habit vs WITHOUT. Needs 3+ data points. Flagged/noisy nights excluded.</div>
+      <div id="habit-impact"><div class="empty">Log 3+ nights to see impact data.</div></div>
+    </div>
+    <div class="card"><div class="clbl">Experiment status</div><div id="exp-status"><div class="empty">Experiments show after 7+ nights.</div></div></div>
+  </div>
+
+  <!-- PROTOCOL -->
+  <div id="pane-protocol" class="pane">
+    <div class="card">
+      <div class="clbl">Noise &amp; error policy</div>
+      <div class="insight ins-a"><div class="ins-i">⚗️</div><div class="ins-t"><strong>One change at a time. 3-night minimum, 7-night ideal.</strong> Flag confounders in notes — excluded from habit scoring. A +5 pt difference over 3+ clean nights = real signal worth acting on.</div></div>
+    </div>
+    <div class="card">
+      <div class="clbl">Do's and Avoid's</div>
+      <div class="proto-grid">
+        <div class="proto-col do">
+          <h4>✓ Do These</h4>
+          <div class="pi"><span>🕙</span><div>Sleep before <strong>11 PM</strong><span class="pi-s pi-c">Science confirmed</span></div></div>
+          <div class="pi"><span>🌡️</span><div>Room <strong>18–20°C</strong><span class="pi-s pi-c">Science confirmed</span></div></div>
+          <div class="pi"><span>🌑</span><div><strong>Complete darkness</strong><span class="pi-s pi-c">Science confirmed</span></div></div>
+          <div class="pi"><span>🏃</span><div><strong>Exercise before 6 PM</strong><span class="pi-s pi-c">Science confirmed</span></div></div>
+          <div class="pi"><span>🥗</span><div>Last meal <strong>2h+ before bed</strong><span class="pi-s pi-c">Science confirmed</span></div></div>
+          <div class="pi"><span>📖</span><div><strong>30m wind-down</strong> routine<span class="pi-s pi-p">Track it — your data will confirm</span></div></div>
+          <div class="pi"><span>⏰</span><div><strong>Same wake time</strong> daily<span class="pi-s pi-c">Science confirmed</span></div></div>
+          <div class="pi"><span>💧</span><div>No liquids <strong>after 8 PM</strong><span class="pi-s pi-p">Track it</span></div></div>
+        </div>
+        <div class="proto-col avoid">
+          <h4>✗ Avoid These</h4>
+          <div class="pi"><span>☕</span><div><strong>Caffeine after 1–2 PM</strong><span class="pi-s pi-h">Proven harmful</span></div></div>
+          <div class="pi"><span>📱</span><div><strong>Screens within 45m of bed</strong><span class="pi-s pi-h">Proven harmful</span></div></div>
+          <div class="pi"><span>🍺</span><div><strong>Alcohol</strong><span class="pi-s pi-h">Proven harmful</span></div></div>
+          <div class="pi"><span>🍕</span><div><strong>Heavy meal within 2h</strong><span class="pi-s pi-h">Proven harmful</span></div></div>
+          <div class="pi"><span>😤</span><div><strong>Stressful content before bed</strong><span class="pi-s pi-h">Proven harmful</span></div></div>
+          <div class="pi"><span>💡</span><div><strong>Bright lights after 9 PM</strong><span class="pi-s pi-p">Track it</span></div></div>
+          <div class="pi"><span>🕐</span><div><strong>Sleeping past midnight</strong><span class="pi-s pi-h">Your data confirms</span></div></div>
+          <div class="pi"><span>⏰</span><div><strong>Snooze button</strong><span class="pi-s pi-h">Proven harmful</span></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="clbl">Experiment queue — one at a time</div>
+      <div class="ir-row"><div class="ir-name">🕙 Sleep before 11 PM</div><div style="font-family:var(--mono);font-size:10px;color:var(--amber)">→ Start here — Experiment 1</div></div>
+      <div class="ir-row"><div class="ir-name">📵 No screens 45m before bed</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Experiment 2</div></div>
+      <div class="ir-row"><div class="ir-name">☕ No caffeine after 1 PM</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Experiment 3</div></div>
+      <div class="ir-row"><div class="ir-name">🏃 Morning / early exercise</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Experiment 4</div></div>
+      <div class="ir-row"><div class="ir-name">🌑 Complete room darkness</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Experiment 5</div></div>
+      <div class="ir-row"><div class="ir-name">📖 30m wind-down routine</div><div style="font-family:var(--mono);font-size:10px;color:var(--muted)">Experiment 6</div></div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<script>
+const GOOD=[
+  {id:'before11',label:'🕙 Slept before 11 PM'},
+  {id:'noscreens',label:'📵 No screens 45m before'},
+  {id:'nocaff',label:'☕ No caffeine after 1 PM'},
+  {id:'exercise',label:'🏃 Exercised today'},
+  {id:'dark',label:'🌑 Room completely dark'},
+  {id:'cool',label:'🌡️ Room cool (18–20°C)'},
+  {id:'winddown',label:'📖 30m wind-down done'},
+  {id:'earlymeal',label:'🥗 Last meal 2h+ before'},
+  {id:'nowater',label:'💧 No liquids after 8 PM'},
+  {id:'samewake',label:'⏰ Same wake time kept'},
+];
+const BAD=[
+  {id:'latebed',label:'🕐 Slept after midnight'},
+  {id:'screens',label:'📱 Screens in bed'},
+  {id:'alcohol',label:'🍺 Had alcohol'},
+  {id:'latemeal',label:'🍕 Heavy meal within 2h'},
+  {id:'latecaff',label:'☕ Caffeine after 2 PM'},
+  {id:'stress',label:'😤 Stressful before bed'},
+  {id:'snooze',label:'⏰ Used snooze'},
+  {id:'brightlight',label:'💡 Bright lights past 9 PM'},
+];
+
+function ld(){try{return JSON.parse(localStorage.getItem('slabg_v1')||'[]');}catch{return[];}}
+function sv(d){try{localStorage.setItem('slabg_v1',JSON.stringify(d));}catch{}}
+function getKey(){return localStorage.getItem('slabg_key')||'';}
+
+let curEx={};
+
+// ── KEY ──
+function saveKey(){
+  const k=document.getElementById('key-inp').value.trim();
+  if(!k.startsWith('AIza')){document.getElementById('key-err').style.display='block';return;}
+  localStorage.setItem('slabg_key',k);
+  document.getElementById('setup').style.display='none';
+  document.getElementById('app').style.display='block';
+  init();
+}
+function changeKey(){
+  const k=prompt('Paste new Gemini API key (AIzaSy...):',getKey());
+  if(k&&k.startsWith('AIza')){localStorage.setItem('slabg_key',k);alert('✓ Key updated!');}
+  else if(k){alert('Invalid key — must start with AIza');}
+}
+
+// ── INIT ──
+function init(){
+  document.getElementById('ex-date').value=new Date().toISOString().split('T')[0];
+  buildGrids();updateCount();
+  const uz=document.getElementById('uz');
+  uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag');});
+  uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
+  uz.addEventListener('drop',e=>{
+    e.preventDefault();uz.classList.remove('drag');
+    const f=e.dataTransfer.files[0];
+    if(f&&f.type.startsWith('image/'))procFile(f);
+  });
+}
+function updateCount(){document.getElementById('nights-count').textContent=ld().length;}
+
+// ── HABIT GRIDS ──
+function buildGrids(){
+  document.getElementById('good-grid').innerHTML=GOOD.map(h=>`<div class="hc" data-id="${h.id}" data-t="yes"><div class="hc-box"></div><div class="hc-lbl">${h.label}</div></div>`).join('');
+  document.getElementById('bad-grid').innerHTML=BAD.map(h=>`<div class="hc" data-id="${h.id}" data-t="no"><div class="hc-box"></div><div class="hc-lbl">${h.label}</div></div>`).join('');
+  document.querySelectorAll('.hc').forEach(el=>el.addEventListener('click',()=>{
+    const c=el.dataset.t,on=el.classList.contains(c);
+    el.classList.toggle(c,!on);
+    el.querySelector('.hc-box').textContent=!on?(c==='yes'?'✓':'✗'):'';
+  }));
+}
+
+// ── FILE ──
+function handleFile(inp){const f=inp.files[0];if(f)procFile(f);}
+function procFile(file){
+  const p=document.getElementById('uz-prev');
+  // Compress image before sending to Gemini
+  const img=new Image();
+  const objectUrl=URL.createObjectURL(file);
+  img.onload=function(){
+    // Draw onto canvas at max 1024px wide to compress
+    const canvas=document.createElement('canvas');
+    const MAX=1024;
+    let w=img.width, h=img.height;
+    if(w>MAX){h=Math.round(h*(MAX/w));w=MAX;}
+    canvas.width=w; canvas.height=h;
+    const ctx=canvas.getContext('2d');
+    ctx.drawImage(img,0,0,w,h);
+    // Export as jpeg at 85% quality
+    const compressed=canvas.toDataURL('image/jpeg',0.85);
+    p.src=compressed; p.style.display='block';
+    const b64=compressed.split(',')[1];
+    console.log('Image compressed to ~'+Math.round(b64.length/1024)+'KB');
+    callGemini(b64,'image/jpeg');
+    URL.revokeObjectURL(objectUrl);
+  };
+  img.src=objectUrl;
+}
+
+// ── GEMINI API (free, no CORS issues) ──
+async function callGemini(b64,mime){
+  const st=document.getElementById('ai-st');
+  const dot=document.getElementById('ai-dot');
+  const txt=document.getElementById('ai-txt');
+  const card=document.getElementById('ex-card');
+
+  st.classList.add('show');
+  dot.classList.add('pulse');
+  dot.style.background='var(--green)';
+  txt.textContent='Reading screenshot with Gemini Vision...';
+  card.style.display='none';
+
+  const key=getKey();
+  if(!key){
+    txt.textContent='No API key found — click "Gemini Key" button.';
+    dot.style.background='var(--red)';
+    dot.classList.remove('pulse');
+    return;
+  }
+
+  const prompt=`Analyze this sleep tracking screenshot. Extract every number you can see.
+
+OUTPUT FORMAT - return ONLY this JSON, absolutely nothing else:
+{"score":null,"sleptAt":null,"wokeAt":null,"totalMinutes":null,"deepMinutes":null,"remMinutes":null,"lightMinutes":null,"awakeMinutes":null}
+
+EXTRACTION RULES:
+
+1. SLEEP SCORE: Look for a number 0-100. Could be labeled "Sleep Score", shown as a big number, or inside a circle/ring. Extract it as an integer.
+
+2. SLEEP START TIME (sleptAt): Look for a time on the LEFT side below the colorful sleep bar, often labeled "Slept at" or "12:47 AM" style. Convert to 24hr: "12:47 AM"="00:47", "11:28 PM"="23:28", "07:39 AM"="07:39".
+
+3. WAKE TIME (wokeAt): Look for a time on the RIGHT side below the sleep bar, labeled "Awake at" or similar. Convert to 24hr format.
+
+4. TOTAL SLEEP (totalMinutes): Look for "7hr 9min" or "7 hr 47 min" or "6h 52m" style. Convert: hours×60 + minutes.
+
+5. DEEP SLEEP (deepMinutes): Find "Deep sleep" label with time like "01:04 Hrs" or "01:20 Hrs". Convert HH:MM to minutes: "01:04"=64, "01:20"=80, "00:32"=32.
+
+6. LIGHT SLEEP (lightMinutes): Find "Light sleep" label with time. Convert same way: "04:44 Hrs"=284, "05:01 Hrs"=301.
+
+7. REM (remMinutes): Find "REM" label with time. Convert: "01:04 Hrs"=64, "00:48 Hrs"=48, "00:32 Hrs"=32.
+
+8. AWAKE (awakeMinutes): Find "Awake" label with time. Convert: "00:01 Hrs"=1, "01:02 Hrs"=62.
+
+CONVERSION FORMULA: For "HH:MM Hrs" format → (HH × 60) + MM = total minutes.
+Examples: "01:04 Hrs"=64min, "04:44 Hrs"=284min, "00:32 Hrs"=32min, "06:43 Hrs"=403min.
+
+Scan the ENTIRE image carefully including small text. Return ONLY the JSON object.`;
+
+  // Auto-discover available models then use first flash vision model
+  async function getAvailableModels(key) {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
+    if (!r.ok) return ['gemini-2.5-flash','gemini-2.0-flash'];
+    const d = await r.json();
+    // Filter to flash models that support generateContent
+    const flashModels = (d.models||[])
+      .filter(m => m.name && m.name.includes('flash') && (m.supportedGenerationMethods||[]).includes('generateContent'))
+      .map(m => m.name.replace('models/',''))
+      .sort((a,b) => {
+        // Prefer 2.5 > 2.0 > 1.5, non-preview first
+        const score = s => {
+          let v = 0;
+          if(s.includes('2.5')) v += 300;
+          else if(s.includes('2.0')) v += 200;
+          else if(s.includes('1.5')) v += 100;
+          if(!s.includes('preview') && !s.includes('exp')) v += 50;
+          return v;
+        };
+        return score(b) - score(a);
+      });
+    return flashModels.length ? flashModels : ['gemini-2.5-flash','gemini-2.0-flash'];
+  }
+
+  async function tryModel(modelName, b64, mime, prompt, key) {
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${key}`;
+    const body={
+      contents:[{parts:[
+        {inlineData:{mimeType:mime,data:b64}},
+        {text:prompt}
+      ]}],
+      generationConfig:{temperature:0,maxOutputTokens:300}
+    };
+    const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||'HTTP '+res.status);}
+    return res.json();
+  }
+
+  try{
+    txt.textContent='Fetching available Gemini models...';
+    const MODELS = await getAvailableModels(key);
+    console.log('Available models:', MODELS);
+    let data=null;
+    let lastErr='';
+    for(const model of MODELS){
+      try{
+        txt.textContent=`Reading with ${model}...`;
+        data=await tryModel(model,b64,mime,prompt,key);
+        break;
+      }catch(e){
+        lastErr=e.message;
+        console.warn(`Model ${model} failed:`,e.message);
+      }
+    }
+    if(!data)throw new Error('All models failed. Last error: '+lastErr);
+
+    const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
+    console.log('Gemini raw response:', raw);
+
+    // Bulletproof JSON extraction — handles markdown, extra text, anything
+    let parsed = {};
+    try {
+      // Try 1: direct parse
+      const clean = raw.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e1) {
+      try {
+        // Try 2: extract first {...} block
+        const match = raw.match(/\{[^{}]*\}/);
+        if(match) parsed = JSON.parse(match[0]);
+        else throw new Error('no JSON object found');
+      } catch(e2) {
+        try {
+          // Try 3: extract numbers individually with regex
+          const num = (pattern) => { const m = raw.match(pattern); return m ? parseInt(m[1]) : null; };
+          const time = (pattern) => { const m = raw.match(pattern); return m ? m[1] : null; };
+          parsed = {
+            score:        num(/score[^\d]*(\d+)/i),
+            sleptAt:      time(/slept?\s*at[^\d]*(\d{1,2}:\d{2})/i),
+            wokeAt:       time(/woke?\s*at[^\d]*(\d{1,2}:\d{2})/i),
+            totalMinutes: num(/total[^\d]*(\d+)\s*min/i),
+            deepMinutes:  num(/deep[^\d]*(\d+)\s*min/i),
+            remMinutes:   num(/rem[^\d]*(\d+)\s*min/i),
+            lightMinutes: num(/light[^\d]*(\d+)\s*min/i),
+            awakeMinutes: num(/awake[^\d]*(\d+)\s*min/i),
+          };
+        } catch(e3) {
+          console.error('All JSON parse attempts failed:', e1, e2, e3);
+        }
+      }
+    }
+
+    curEx=parsed;
+    populate(parsed);
+
+    dot.classList.remove('pulse');
+    dot.style.background='var(--green)';
+    txt.textContent='✓ Data extracted by Gemini — review, tick habits, then save';
+    card.style.display='block';
+    card.scrollIntoView({behavior:'smooth',block:'start'});
+
+  }catch(err){
+    dot.classList.remove('pulse');
+    dot.style.background='var(--red)';
+    txt.textContent='Error: '+err.message;
+    curEx={};
+    card.style.display='block';
+    console.error('Gemini error:',err);
+  }
+}
+
+// ── POPULATE ──
+function populate(d){
+  const s=id=>document.getElementById(id);
+  s('ex-score').textContent=d.score??'—';
+  s('ex-deep').textContent=d.deepMinutes??'—';
+  s('ex-rem').textContent=d.remMinutes??'—';
+  s('ex-light').textContent=d.lightMinutes??'—';
+  s('ex-awake').textContent=d.awakeMinutes??'—';
+  s('ex-total').textContent=d.totalMinutes??'—';
+  if(d.sleptAt)s('ex-slept').value=d.sleptAt;
+  if(d.wokeAt)s('ex-woke').value=d.wokeAt;
+  // Auto-tick late bedtime
+  if(d.sleptAt){
+    const[h]=d.sleptAt.split(':').map(Number);
+    if(h>=0&&h<8){
+      const el=document.querySelector('[data-id="latebed"]');
+      if(el&&!el.classList.contains('no')){el.classList.add('no');el.querySelector('.hc-box').textContent='✗';}
+    }
+  }
+}
+
+// ── SAVE ──
+function confirmSave(){
+  const date=document.getElementById('ex-date').value;
+  if(!date){alert('Set the date first.');return;}
+  const entry={
+    date,
+    score:typeof curEx.score==='number'?curEx.score:0,
+    sleptAt:document.getElementById('ex-slept').value,
+    wokeAt:document.getElementById('ex-woke').value,
+    totalMinutes:curEx.totalMinutes||0,
+    deep:curEx.deepMinutes||0,
+    rem:curEx.remMinutes||0,
+    light:curEx.lightMinutes||0,
+    awake:curEx.awakeMinutes||0,
+    notes:document.getElementById('ex-notes').value,
+    goodDone:[...document.querySelectorAll('#good-grid .hc.yes')].map(e=>e.dataset.id),
+    badDone:[...document.querySelectorAll('#bad-grid .hc.no')].map(e=>e.dataset.id),
+    ts:Date.now()
   };
   const data=ld();
   const idx=data.findIndex(d=>d.date===date);
