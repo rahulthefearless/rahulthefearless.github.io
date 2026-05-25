@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sleep Lab AI v5 — Boat Wave 2</title>
+<title>Sleep Lab AI v6 — Boat Wave 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div>
       <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
       <div class="logo">Sleep <span>Lab</span> AI</div>
-      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v5 JSON-FIX</span></div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v6 SMART-PROMPT</span></div>
     </div>
     <div class="hdr-right">
       <div class="nights-badge">
@@ -477,22 +477,37 @@ async function callGemini(b64,mime){
     return;
   }
 
-  const prompt=`You are a sleep data extractor. Look at this Boat Wave 2 or Zepp sleep tracking app screenshot carefully.
+  const prompt=`You are analyzing a sleep tracking app screenshot from a Boat Wave 2 smartwatch or Zepp app.
 
-Extract all visible sleep data and return ONLY this JSON object, nothing else, no markdown, no explanation:
+Look VERY carefully at the ENTIRE image. Find ALL numbers and times visible anywhere on screen.
+
+The app typically shows:
+- A large number like "7hr 9min" or "7h 47m" = total sleep duration
+- A time on the LEFT side of a bar = when sleep started (e.g. "11:28 PM" or "12:26 AM")  
+- A time on the RIGHT side of a bar = when they woke up (e.g. "07:35 AM" or "08:16 AM")
+- "Deep sleep" with a duration like "01:20 Hrs" or "00:32 Hrs"
+- "Light sleep" with a duration like "05:01 Hrs" or "06:43 Hrs"  
+- "REM" with a duration like "00:48 Hrs" or "00:32 Hrs"
+- "Awake" with a duration like "00:01 Hrs" or "01:02 Hrs"
+- A sleep score number (0-100) shown prominently
+
+Convert ALL durations to total minutes:
+- "01:20 Hrs" = 80 minutes
+- "00:32 Hrs" = 32 minutes  
+- "05:01 Hrs" = 301 minutes
+- "7hr 9min" = 429 minutes
+- "7 hr 47 min" = 467 minutes
+
+Convert times to 24hr HH:MM:
+- "11:28 PM" = "23:28"
+- "12:26 AM" = "00:26"
+- "07:35 AM" = "07:35"
+- "08:16 AM" = "08:16"
+
+Return ONLY this exact JSON with NO markdown, NO explanation, NO extra text:
 {"score":null,"sleptAt":null,"wokeAt":null,"totalMinutes":null,"deepMinutes":null,"remMinutes":null,"lightMinutes":null,"awakeMinutes":null}
 
-Rules:
-- score: the sleep score number shown (0-100), or null
-- sleptAt: sleep start time in 24hr HH:MM format (e.g. "00:26" for 12:26 AM), or null
-- wokeAt: wake time in 24hr HH:MM format, or null  
-- totalMinutes: total sleep duration converted to minutes (e.g. 7hr 9min = 429), or null
-- deepMinutes: deep sleep converted to minutes (e.g. 1hr 20min = 80, 00:32 Hrs = 32), or null
-- remMinutes: REM sleep converted to minutes, or null
-- lightMinutes: light sleep converted to minutes, or null
-- awakeMinutes: awake time converted to minutes, or null
-
-Return ONLY the JSON. No other text.`;
+Fill every field you can see. Use null only if truly not visible.`;
 
   // Auto-discover available models then use first flash vision model
   async function getAvailableModels(key) {
