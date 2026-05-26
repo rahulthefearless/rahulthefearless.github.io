@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sleep Lab AI v9 — Boat Wave 2</title>
+<title>Sleep Lab AI v10 — Boat Wave 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div>
       <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
       <div class="logo">Sleep <span>Lab</span> AI</div>
-      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v9 DEBUG</span></div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v10 FINAL</span></div>
     </div>
     <div class="hdr-right">
       <div class="nights-badge">
@@ -518,7 +518,9 @@ EXTRACTION RULES:
 CONVERSION FORMULA: For "HH:MM Hrs" format → (HH × 60) + MM = total minutes.
 Examples: "01:04 Hrs"=64min, "04:44 Hrs"=284min, "00:32 Hrs"=32min, "06:43 Hrs"=403min.
 
-Scan the ENTIRE image carefully including small text. Return ONLY the JSON object.`;
+Scan the ENTIRE image carefully including small text. CRITICAL: Do NOT use markdown. Do NOT use backticks. Do NOT write \`\`\`json. 
+Output the raw JSON object directly with no formatting whatsoever.
+Example of correct output: {"score":71,"sleptAt":"00:26","wokeAt":"07:35","totalMinutes":429,"deepMinutes":80,"remMinutes":48,"lightMinutes":301,"awakeMinutes":1}`;
 
   // Auto-discover available models then use first flash vision model
   async function getAvailableModels(key) {
@@ -587,37 +589,28 @@ Scan the ENTIRE image carefully including small text. Return ONLY the JSON objec
     const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
     log('► Raw response: ' + raw.substring(0,200));
 
-    // Bulletproof JSON extraction — handles markdown, extra text, anything
+    // Bulletproof JSON extraction
     let parsed = {};
     try {
-      // Try 1: direct parse
-      const clean = raw.replace(/```json|```/g,'').trim();
-      parsed = JSON.parse(clean);
-    } catch(e1) {
-      try {
-        // Try 2: extract first {...} block
-        const match = raw.match(/\{[^{}]*\}/);
-        if(match) parsed = JSON.parse(match[0]);
-        else throw new Error('no JSON object found');
-      } catch(e2) {
-        try {
-          // Try 3: extract numbers individually with regex
-          const num = (pattern) => { const m = raw.match(pattern); return m ? parseInt(m[1]) : null; };
-          const time = (pattern) => { const m = raw.match(pattern); return m ? m[1] : null; };
-          parsed = {
-            score:        num(/score[^\d]*(\d+)/i),
-            sleptAt:      time(/slept?\s*at[^\d]*(\d{1,2}:\d{2})/i),
-            wokeAt:       time(/woke?\s*at[^\d]*(\d{1,2}:\d{2})/i),
-            totalMinutes: num(/total[^\d]*(\d+)\s*min/i),
-            deepMinutes:  num(/deep[^\d]*(\d+)\s*min/i),
-            remMinutes:   num(/rem[^\d]*(\d+)\s*min/i),
-            lightMinutes: num(/light[^\d]*(\d+)\s*min/i),
-            awakeMinutes: num(/awake[^\d]*(\d+)\s*min/i),
-          };
-        } catch(e3) {
-          console.error('All JSON parse attempts failed:', e1, e2, e3);
-        }
+      // Strip ALL markdown formatting variations
+      let clean = raw
+        .replace(/^```json\s*/gi, '')
+        .replace(/^```\s*/gi, '')
+        .replace(/\s*```$/gi, '')
+        .replace(/`/g, '')
+        .trim();
+      log('► Cleaned: ' + clean.substring(0, 150));
+      // Find the JSON object
+      const jsonMatch = clean.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsed = JSON.parse(jsonMatch[0]);
+        log('► Parsed OK: score=' + parsed.score + ' deep=' + parsed.deepMinutes);
+      } else {
+        throw new Error('No JSON object in response');
       }
+    } catch(e) {
+      log('✗ Parse error: ' + e.message);
+      parsed = {};
     }
 
     curEx=parsed;
@@ -690,7 +683,6 @@ function confirmSave(){
   document.getElementById('ex-notes').value='';
   curEx={};
 }
-
 
 // ── DASHBOARD ──
 function renderDash(){
