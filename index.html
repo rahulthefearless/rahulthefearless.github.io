@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sleep Lab AI v14 — Boat Wave 2</title>
+<title>Sleep Lab AI v15 — Boat Wave 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div>
       <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
       <div class="logo">Sleep <span>Lab</span> AI</div>
-      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v14 REGEX</span></div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v15 REGEX</span></div>
     </div>
     <div class="hdr-right">
       <div class="nights-badge">
@@ -275,7 +275,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div class="card" id="ex-card" style="display:none">
       <div class="clbl">Extracted data — review &amp; confirm</div>
       <div class="ex-grid">
-        <div class="ex-box"><div class="ex-val" id="ex-score" style="color:var(--amber)">—</div><div class="ex-lbl">Sleep score</div></div>
+        <div class="ex-box"><div class="ex-val" id="ex-score" style="color:var(--amber)">—</div><div class="ex-lbl">Sleep score <span id="score-src" style="font-size:8px;color:var(--muted);display:block;margin-top:1px;"></span></div></div>
         <div class="ex-box"><div class="ex-val" id="ex-deep" style="color:var(--red)">—</div><div class="ex-lbl">Deep (min)</div></div>
         <div class="ex-box"><div class="ex-val" id="ex-rem" style="color:var(--purple)">—</div><div class="ex-lbl">REM (min)</div></div>
         <div class="ex-box"><div class="ex-val" id="ex-light" style="color:var(--green)">—</div><div class="ex-lbl">Light (min)</div></div>
@@ -631,7 +631,6 @@ Convert HH:MM Hrs to minutes (01:04 Hrs=64, 04:44 Hrs=284). Times to 24hr (12:47
 // ── POPULATE ──
 function populate(d){
   const s=id=>document.getElementById(id);
-  s('ex-score').textContent=d.score??'—';
   s('ex-deep').textContent=d.deepMinutes??'—';
   s('ex-rem').textContent=d.remMinutes??'—';
   s('ex-light').textContent=d.lightMinutes??'—';
@@ -639,6 +638,33 @@ function populate(d){
   s('ex-total').textContent=d.totalMinutes??'—';
   if(d.sleptAt)s('ex-slept').value=d.sleptAt;
   if(d.wokeAt)s('ex-woke').value=d.wokeAt;
+
+  // Show watch score if available, otherwise calculate from data
+  if(d.score && d.score > 0){
+    s('ex-score').textContent = d.score;
+    s('ex-score').title = 'Score from watch';
+    const srcEl=document.getElementById('score-src');
+    if(srcEl) srcEl.textContent='from watch';
+  } else {
+    // Calculate score immediately from extracted data
+    const tempEntry = {
+      deep: d.deepMinutes||0,
+      rem: d.remMinutes||0,
+      light: d.lightMinutes||0,
+      awake: d.awakeMinutes||0,
+      totalMinutes: d.totalMinutes||0,
+      sleptAt: d.sleptAt||''
+    };
+    const calculated = calcScore(tempEntry);
+    s('ex-score').textContent = calculated;
+    s('ex-score').title = 'Calculated score (watch did not provide one)';
+    const srcEl2=document.getElementById('score-src');
+    if(srcEl2) srcEl2.textContent='auto-calculated';
+    // Store calculated score back into curEx
+    curEx.score = calculated;
+    curEx._scoreCalculated = true;
+  }
+
   // Auto-tick late bedtime
   if(d.sleptAt){
     const[h]=d.sleptAt.split(':').map(Number);
