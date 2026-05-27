@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sleep Lab AI v11 — Boat Wave 2</title>
+<title>Sleep Lab AI v13 — Boat Wave 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div>
       <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
       <div class="logo">Sleep <span>Lab</span> AI</div>
-      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v11 FIXED</span></div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v13 REGEX</span></div>
     </div>
     <div class="hdr-right">
       <div class="nights-badge">
@@ -269,7 +269,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
         <div class="ai-dot pulse" id="ai-dot"></div>
         <div class="ai-txt" id="ai-txt">Reading screenshot with Gemini...</div>
       </div>
-      <div id="debug-box" style="display:none;margin-top:10px;background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#0f0;line-height:1.8;word-break:break-all;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
+      <textarea id="debug-box" style="display:none;margin-top:10px;background:#0a0a0a;border:1px solid #333;border-radius:8px;padding:12px;font-family:monospace;font-size:11px;color:#0f0;line-height:1.8;word-break:break-all;white-space:pre-wrap;max-height:220px;overflow-y:auto;width:100%;resize:none;" readonly></textarea>
     </div>
 
     <div class="card" id="ex-card" style="display:none">
@@ -492,35 +492,9 @@ async function callGemini(b64,mime){
     return;
   }
 
-  const prompt=`Analyze this sleep tracking screenshot. Extract every number you can see.
-
-OUTPUT FORMAT - return ONLY this JSON, absolutely nothing else:
+  const prompt = `This is a Boat Wave 2 sleep tracking app screenshot. Read all visible numbers and return this JSON only, no markdown, no backticks, no explanation:
 {"score":null,"sleptAt":null,"wokeAt":null,"totalMinutes":null,"deepMinutes":null,"remMinutes":null,"lightMinutes":null,"awakeMinutes":null}
-
-EXTRACTION RULES:
-
-1. SLEEP SCORE: Look for a number 0-100. Could be labeled "Sleep Score", shown as a big number, or inside a circle/ring. Extract it as an integer.
-
-2. SLEEP START TIME (sleptAt): Look for a time on the LEFT side below the colorful sleep bar, often labeled "Slept at" or "12:47 AM" style. Convert to 24hr: "12:47 AM"="00:47", "11:28 PM"="23:28", "07:39 AM"="07:39".
-
-3. WAKE TIME (wokeAt): Look for a time on the RIGHT side below the sleep bar, labeled "Awake at" or similar. Convert to 24hr format.
-
-4. TOTAL SLEEP (totalMinutes): Look for "7hr 9min" or "7 hr 47 min" or "6h 52m" style. Convert: hours×60 + minutes.
-
-5. DEEP SLEEP (deepMinutes): Find "Deep sleep" label with time like "01:04 Hrs" or "01:20 Hrs". Convert HH:MM to minutes: "01:04"=64, "01:20"=80, "00:32"=32.
-
-6. LIGHT SLEEP (lightMinutes): Find "Light sleep" label with time. Convert same way: "04:44 Hrs"=284, "05:01 Hrs"=301.
-
-7. REM (remMinutes): Find "REM" label with time. Convert: "01:04 Hrs"=64, "00:48 Hrs"=48, "00:32 Hrs"=32.
-
-8. AWAKE (awakeMinutes): Find "Awake" label with time. Convert: "00:01 Hrs"=1, "01:02 Hrs"=62.
-
-CONVERSION FORMULA: For "HH:MM Hrs" format → (HH × 60) + MM = total minutes.
-Examples: "01:04 Hrs"=64min, "04:44 Hrs"=284min, "00:32 Hrs"=32min, "06:43 Hrs"=403min.
-
-Scan the ENTIRE image carefully including small text. CRITICAL: Do NOT use markdown. Do NOT use backticks. Do NOT write \`\`\`json. 
-Output the raw JSON object directly with no formatting whatsoever.
-Example of correct output: {"score":71,"sleptAt":"00:26","wokeAt":"07:35","totalMinutes":429,"deepMinutes":80,"remMinutes":48,"lightMinutes":301,"awakeMinutes":1}`;
+Convert HH:MM Hrs to minutes (01:04 Hrs=64, 04:44 Hrs=284). Times to 24hr (12:47 AM=00:47, 07:39 AM=07:39). totalMinutes from "6hr 52min"=412. JSON only.`;
 
   // Auto-discover available models then use first flash vision model
   async function getAvailableModels(key) {
@@ -553,7 +527,7 @@ Example of correct output: {"score":71,"sleptAt":"00:26","wokeAt":"07:35","total
         {inlineData:{mimeType:mime,data:b64}},
         {text:prompt}
       ]}],
-      generationConfig:{temperature:0,maxOutputTokens:800}
+      generationConfig:{temperature:0,maxOutputTokens:2000}
     };
     const res=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error(e?.error?.message||'HTTP '+res.status);}
@@ -562,8 +536,8 @@ Example of correct output: {"score":71,"sleptAt":"00:26","wokeAt":"07:35","total
 
   try{
     const dbg = document.getElementById('debug-box');
-    dbg.style.display='block'; dbg.textContent='';
-    const log = (msg) => { dbg.textContent += msg + '\n'; console.log(msg); };
+    dbg.style.display='block'; dbg.value='';
+    const log = (msg) => { dbg.value += msg + '\n'; dbg.scrollTop = dbg.scrollHeight; console.log(msg); };
 
     log('► Fetching available Gemini models...');
     txt.textContent='Fetching available Gemini models...';
@@ -589,31 +563,50 @@ Example of correct output: {"score":71,"sleptAt":"00:26","wokeAt":"07:35","total
     const raw=data?.candidates?.[0]?.content?.parts?.[0]?.text||'{}';
     log('► Raw response: ' + raw);
 
-    // Bulletproof JSON extraction
+    // Parse Gemini response
     let parsed = {};
     try {
-      // Strip ALL markdown formatting variations
-      let clean = raw
-        .replace(/^```json\s*/gi, '')
-        .replace(/^```\s*/gi, '')
-        .replace(/\s*```$/gi, '')
-        .replace(/`/g, '')
-        .trim();
-      log('► Cleaned: ' + clean);
-      // Find the JSON object
-      // Find the last } to get the complete JSON object
-      const firstBrace = clean.indexOf('{');
-      const lastBrace = clean.lastIndexOf('}');
-      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
-        const jsonStr = clean.substring(firstBrace, lastBrace + 1);
-        parsed = JSON.parse(jsonStr);
-        log('► Parsed OK: score=' + parsed.score + ' deep=' + parsed.deepMinutes + ' rem=' + parsed.remMinutes);
-      } else {
-        throw new Error('No complete JSON object found. firstBrace=' + firstBrace + ' lastBrace=' + lastBrace);
-      }
+      // Step 1: get the full raw text
+      let txt2 = raw || '';
+      log('► Full length: ' + txt2.length + ' chars');
+
+      // Step 2: strip markdown backticks completely
+      txt2 = txt2.replace(/```json/gi,'').replace(/```/g,'').trim();
+
+      // Step 3: find opening and closing brace positions
+      const fb = txt2.indexOf('{');
+      const lb = txt2.lastIndexOf('}');
+      log('► Braces: first=' + fb + ' last=' + lb + ' len=' + txt2.length);
+
+      if(fb === -1) throw new Error('No opening brace found');
+      if(lb === -1) throw new Error('No closing brace - response truncated. Length=' + txt2.length);
+
+      // Step 4: extract and parse
+      const jsonStr = txt2.slice(fb, lb + 1);
+      log('► JSON str: ' + jsonStr.substring(0,100));
+      parsed = JSON.parse(jsonStr);
+      log('► Parsed OK: score=' + parsed.score + ' deep=' + parsed.deepMinutes + ' rem=' + parsed.remMinutes + ' light=' + parsed.lightMinutes);
+
     } catch(e) {
       log('✗ Parse error: ' + e.message);
-      parsed = {};
+      // Last resort: manually extract each number with regex
+      log('► Trying regex fallback...');
+      try {
+        const g = (re) => { const m = raw.match(re); return m ? (isNaN(m[1]) ? m[1] : Number(m[1])) : null; };
+        parsed = {
+          score:        g(/"score"\s*:\s*(\d+)/),
+          sleptAt:      g(/"sleptAt"\s*:\s*"([^"]+)"/),
+          wokeAt:       g(/"wokeAt"\s*:\s*"([^"]+)"/),
+          totalMinutes: g(/"totalMinutes"\s*:\s*(\d+)/),
+          deepMinutes:  g(/"deepMinutes"\s*:\s*(\d+)/),
+          remMinutes:   g(/"remMinutes"\s*:\s*(\d+)/),
+          lightMinutes: g(/"lightMinutes"\s*:\s*(\d+)/),
+          awakeMinutes: g(/"awakeMinutes"\s*:\s*(\d+)/),
+        };
+        log('► Regex result: score=' + parsed.score + ' deep=' + parsed.deepMinutes);
+      } catch(e2) {
+        log('✗ Regex also failed: ' + e2.message);
+      }
     }
 
     curEx=parsed;
