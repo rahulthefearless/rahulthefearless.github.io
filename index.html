@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sleep Lab AI v13 — Boat Wave 2</title>
+<title>Sleep Lab AI v14 — Boat Wave 2</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -236,7 +236,7 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;b
     <div>
       <div class="eyebrow">// Boat Wave 2 · Gemini Vision · Free Forever</div>
       <div class="logo">Sleep <span>Lab</span> AI</div>
-      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v13 REGEX</span></div>
+      <div class="tagline">Screenshot → Gemini reads it → saved → patterns emerge &nbsp;·&nbsp; <span style="color:var(--green);font-size:10px;">v14 REGEX</span></div>
     </div>
     <div class="hdr-right">
       <div class="nights-badge">
@@ -650,12 +650,149 @@ function populate(d){
 }
 
 // ── SAVE ──
-function confirmSave(){
+function calcScore(e){
+  // Calculate sleep score from raw data
+  let score = 0;
+  // Duration (max 25pts) - target 420min (7hrs)
+  const dur = e.totalMinutes || (e.deep+e.rem+e.light+e.awake);
+  if(dur >= 480) score += 25;
+  else if(dur >= 420) score += 22;
+  else if(dur >= 360) score += 16;
+  else if(dur >= 300) score += 10;
+  else score += 5;
+  // Deep sleep (max 25pts) - target 90min
+  if(e.deep >= 90) score += 25;
+  else if(e.deep >= 70) score += 20;
+  else if(e.deep >= 50) score += 14;
+  else if(e.deep >= 30) score += 8;
+  else score += 3;
+  // REM sleep (max 25pts) - target 90min
+  if(e.rem >= 90) score += 25;
+  else if(e.rem >= 70) score += 20;
+  else if(e.rem >= 50) score += 14;
+  else if(e.rem >= 30) score += 8;
+  else score += 3;
+  // Continuity - awake time (max 15pts)
+  if(e.awake <= 5) score += 15;
+  else if(e.awake <= 15) score += 12;
+  else if(e.awake <= 25) score += 8;
+  else if(e.awake <= 45) score += 4;
+  else score += 0;
+  // Bedtime timing (max 10pts)
+  if(e.sleptAt){
+    const[h,m]=e.sleptAt.split(':').map(Number);
+    const mins = h*60+m;
+    const adj = mins < 360 ? mins+1440 : mins; // handle after midnight
+    if(adj >= 1320 && adj <= 1380) score += 10; // 10-11pm ideal
+    else if(adj >= 1380 && adj <= 1440) score += 7; // 11pm-midnight
+    else if(adj > 1440 && adj <= 1500) score += 3; // midnight-1am
+    else score += 0;
+  }
+  return Math.min(100, score);
+}
+
+async function runAIAnalysis(entry, prevEntry, apiKey){
+  const prev = prevEntry ? `Previous night (${prevEntry.date}): score=${prevEntry.score}, deep=${prevEntry.deep}min, rem=${prevEntry.rem}min, light=${prevEntry.light}min, awake=${prevEntry.awake}min, total=${prevEntry.totalMinutes}min` : 'No previous night data';
+  
+  const prompt = `You are a sleep scientist. Analyse this sleep data and respond in exactly this format with no extra text:
+
+ANALYSIS: [2 sentences on overall quality and what the numbers mean]
+DEEP: [1 sentence on deep sleep status - target 90min]
+REM: [1 sentence on REM status - target 90min]  
+AWAKE: [1 sentence on awake time - limit 25min]
+VS_YESTERDAY: [1 sentence comparing to previous night, mention specific number improvements or declines]
+TIP: [1 specific actionable tip for tonight based on their biggest weakness]
+
+Today's data (${entry.date}): score=${entry.score}, deep=${entry.deep}min, rem=${entry.rem}min, light=${entry.light}min, awake=${entry.awake}min, total=${entry.totalMinutes}min, slept=${entry.sleptAt}, woke=${entry.wokeAt}
+${prev}`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      contents:[{parts:[{text:prompt}]}],
+      generationConfig:{temperature:0.3, maxOutputTokens:600}
+    })
+  });
+  if(!res.ok) throw new Error('Analysis API failed');
+  const d = await res.json();
+  return d?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+function parseAnalysis(text){
+  const get = (key) => {
+    const m = text.match(new RegExp(key + ':\s*(.+?)(?=\n[A-Z_]+:|$)', 's'));
+    return m ? m[1].trim() : '';
+  };
+  return {
+    analysis: get('ANALYSIS'),
+    deep: get('DEEP'),
+    rem: get('REM'),
+    awake: get('AWAKE'),
+    vsYesterday: get('VS_YESTERDAY'),
+    tip: get('TIP')
+  };
+}
+
+function showAnalysisModal(entry, analysisText){
+  const a = parseAnalysis(analysisText);
+  const sc = entry.score;
+  const scColor = sc>=80?'#00e5a0':sc>=65?'#ffaa00':'#ff4d6d';
+  
+  // Remove existing modal
+  const existing = document.getElementById('analysis-modal');
+  if(existing) existing.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'analysis-modal';
+  modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:1rem;overflow-y:auto;`;
+  modal.innerHTML = `
+    <div style="background:#0c0c18;border:1px solid #262640;border-radius:16px;padding:1.5rem;max-width:600px;width:100%;margin:auto;position:relative;">
+      <button onclick="document.getElementById('analysis-modal').remove()" style="position:absolute;top:12px;right:12px;background:#1e1e35;border:none;color:#888;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;">×</button>
+      
+      <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;color:#5a5a80;margin-bottom:12px;">// SLEEP ANALYSIS — ${entry.date}</div>
+      
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid #1e1e35;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:72px;color:${scColor};line-height:1;letter-spacing:2px;">${sc}</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#ddddf5;margin-bottom:6px;">${sc>=80?'Excellent night':sc>=65?'Good night — room to improve':'Needs work — focus on tonight'}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div style="background:#111120;border-radius:6px;padding:7px 10px;text-align:center;"><div style="font-size:16px;font-weight:600;color:#ff4d6d;">${entry.deep}m</div><div style="font-size:9px;color:#5a5a80;margin-top:1px;">DEEP</div></div>
+            <div style="background:#111120;border-radius:6px;padding:7px 10px;text-align:center;"><div style="font-size:16px;font-weight:600;color:#c084fc;">${entry.rem}m</div><div style="font-size:9px;color:#5a5a80;margin-top:1px;">REM</div></div>
+            <div style="background:#111120;border-radius:6px;padding:7px 10px;text-align:center;"><div style="font-size:16px;font-weight:600;color:#00e5a0;">${entry.light}m</div><div style="font-size:9px;color:#5a5a80;margin-top:1px;">LIGHT</div></div>
+            <div style="background:#111120;border-radius:6px;padding:7px 10px;text-align:center;"><div style="font-size:16px;font-weight:600;color:#ffaa00;">${entry.awake}m</div><div style="font-size:9px;color:#5a5a80;margin-top:1px;">AWAKE</div></div>
+          </div>
+        </div>
+      </div>
+
+      ${a.analysis ? `<div style="font-size:13px;color:#aaa;line-height:1.7;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid #1e1e35;">${a.analysis}</div>` : ''}
+      
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;">
+        ${a.deep ? `<div style="background:#111120;border-left:3px solid #ff4d6d;border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:#aaa;line-height:1.6;"><strong style="color:#ff4d6d;">Deep</strong> ${a.deep}</div>` : ''}
+        ${a.rem ? `<div style="background:#111120;border-left:3px solid #c084fc;border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:#aaa;line-height:1.6;"><strong style="color:#c084fc;">REM</strong> ${a.rem}</div>` : ''}
+        ${a.awake ? `<div style="background:#111120;border-left:3px solid #ffaa00;border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:#aaa;line-height:1.6;"><strong style="color:#ffaa00;">Awake</strong> ${a.awake}</div>` : ''}
+        ${a.vsYesterday ? `<div style="background:#111120;border-left:3px solid #4da6ff;border-radius:0 8px 8px 0;padding:9px 12px;font-size:12px;color:#aaa;line-height:1.6;"><strong style="color:#4da6ff;">vs Yesterday</strong> ${a.vsYesterday}</div>` : ''}
+      </div>
+
+      ${a.tip ? `
+      <div style="background:rgba(0,229,160,0.07);border:1px solid rgba(0,229,160,0.25);border-radius:10px;padding:14px;">
+        <div style="font-family:'Space Mono',monospace;font-size:9px;letter-spacing:2px;color:#00e5a0;margin-bottom:6px;">✦ TONIGHT'S TIP</div>
+        <div style="font-size:13px;color:#ddddf5;line-height:1.7;">${a.tip}</div>
+      </div>` : ''}
+      
+      <button onclick="document.getElementById('analysis-modal').remove()" style="width:100%;margin-top:1rem;padding:11px;background:linear-gradient(135deg,#00b37a,#00e5a0);color:#000;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;">Got it — close</button>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+async function confirmSave(){
   const date=document.getElementById('ex-date').value;
   if(!date){alert('Set the date first.');return;}
-  const entry={
+  
+  // Calculate score from raw data if not provided
+  const rawEntry = {
     date,
-    score:typeof curEx.score==='number'?curEx.score:0,
     sleptAt:document.getElementById('ex-slept').value,
     wokeAt:document.getElementById('ex-woke').value,
     totalMinutes:curEx.totalMinutes||0,
@@ -668,16 +805,36 @@ function confirmSave(){
     badDone:[...document.querySelectorAll('#bad-grid .hc.no')].map(e=>e.dataset.id),
     ts:Date.now()
   };
+  
+  // Use watch score if available, else calculate
+  const watchScore = (typeof curEx.score==='number' && curEx.score > 0) ? curEx.score : null;
+  rawEntry.score = watchScore || calcScore(rawEntry);
+  rawEntry.scoreSource = watchScore ? 'watch' : 'calculated';
+
   const data=ld();
+  const prevEntry = data.length > 0 ? data[0] : null;
   const idx=data.findIndex(d=>d.date===date);
-  if(idx>=0)data[idx]=entry;else data.unshift(entry);
+  if(idx>=0)data[idx]=rawEntry;else data.unshift(rawEntry);
   data.sort((a,b)=>b.date.localeCompare(a.date));
   sv(data);updateCount();
+  
   const m=document.getElementById('confirm-msg');
-  m.style.display='block';setTimeout(()=>m.style.display='none',3000);
+  m.style.display='block';
+  m.textContent='✓ Saved — generating AI analysis...';
+
   document.querySelectorAll('.hc').forEach(el=>{el.classList.remove('yes','no');el.querySelector('.hc-box').textContent='';});
   document.getElementById('ex-notes').value='';
   curEx={};
+
+  // Run AI analysis
+  try {
+    const analysisText = await runAIAnalysis(rawEntry, prevEntry, getKey());
+    m.style.display='none';
+    showAnalysisModal(rawEntry, analysisText);
+  } catch(err) {
+    m.textContent='✓ Saved — analysis failed: ' + err.message;
+    setTimeout(()=>m.style.display='none', 3000);
+  }
 }
 
 // ── DASHBOARD ──
